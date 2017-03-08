@@ -23,7 +23,7 @@ type UserViewModel struct {
 func saveUser(user *models.User, c *gin.Context) {
 	session := c.MustGet("UserSession").(*models.Session)
 
-	err := user.Save(config.UserColl)
+	err := userapi.Upsert(user)
 
 	if err != nil {
 		panic(err)
@@ -63,7 +63,6 @@ func Facebook(c *gin.Context) {
 	}
 
 	user, err := userapi.GetByFbID(fb.ProfileID)
-
 	if user == nil {
 		user = &models.User{
 			Fb:        fb,

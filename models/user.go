@@ -25,12 +25,12 @@ type Facebook struct {
 
 // Instagram - Instagram login model
 type Instagram struct {
-	BaseThirdParty
+	BaseThirdParty `bson:",inline"`
 }
 
 // Twitter - Twitter login model
 type Twitter struct {
-	BaseThirdParty
+	BaseThirdParty `bson:",inline"`
 }
 
 // User - User model

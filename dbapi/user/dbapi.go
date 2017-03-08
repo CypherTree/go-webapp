@@ -28,6 +28,17 @@ func GetByFbID(fbID string) (*models.User, error) {
 	return user, err
 }
 
+// Upsert - Insert or update user
+func Upsert(user *models.User) error {
+	user.BeforeSave()
+	query := bson.M{
+		"_id": user.ID,
+	}
+
+	err := db.Conn.Upsert(query, config.UserColl, &user)
+	return err
+}
+
 // ValidateAuthToken - Validate auth token and return user obj
 func ValidateAuthToken(tokenString string, session *models.Session) {
 	if tokenString == "" || IsTokenBlacklisted(tokenString) {

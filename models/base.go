@@ -1,8 +1,6 @@
 package models
 
 import (
-	"go-webapp/config"
-	"go-webapp/db"
 	"time"
 
 	"gopkg.in/mgo.v2/bson"
@@ -10,13 +8,13 @@ import (
 
 // BaseModel - Base model
 type BaseModel struct {
-	ID        bson.ObjectId `json:"_id,omitempty" bson:"_id,omitempty" required:"true"`
+	ID        bson.ObjectId `json:"_id,omitempty" bson:"_id" required:"true"`
 	CreatedOn int64         `json:"created_on" bson:"created_on"`
 	UpdatedOn int64         `json:"updated_on" bson:"updated_on"`
 }
 
-// Save - Save model to db
-func (m *BaseModel) Save(tableName string) error {
+// BeforeSave - Set object id and other attrs before save
+func (m *BaseModel) BeforeSave() {
 	if !m.ID.Valid() {
 		m.ID = bson.NewObjectId()
 	}
@@ -27,12 +25,4 @@ func (m *BaseModel) Save(tableName string) error {
 	}
 
 	m.UpdatedOn = now
-
-	query := bson.M{
-		"_id": m.ID,
-	}
-
-	err := db.Conn.Upsert(query, config.UserColl, &m)
-
-	return err
 }
