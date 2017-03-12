@@ -63,6 +63,10 @@ func Facebook(c *gin.Context) {
 	}
 
 	user, err := userapi.GetByFbID(fb.ProfileID)
+	if err != nil {
+		panic(err)
+	}
+
 	if user == nil {
 		user = &models.User{
 			Fb:        fb,

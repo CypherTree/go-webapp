@@ -53,5 +53,7 @@ func MakeConn(connString string, dbname string) *MConn {
 		panic(err)
 	}
 
+	session.SetMode(mgo.Monotonic, true)
+
 	return &MConn{Session: session, DbName: dbname, ConnString: connString}
 }
