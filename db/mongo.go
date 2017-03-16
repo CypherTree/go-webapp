@@ -23,7 +23,7 @@ func (conn *MConn) GetOne(query bson.M, tableName string, result interface{}) er
 	defer session.Close()
 
 	coll := session.DB(conn.DbName).C(tableName)
-	err := coll.Find(query).One(&result)
+	err := coll.Find(query).One(result)
 
 	return err
 }

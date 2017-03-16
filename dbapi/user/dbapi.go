@@ -20,9 +20,10 @@ type CustomClaims struct {
 
 // GetByFbID - Fetch one user by facebook id
 func GetByFbID(fbID string) (*models.User, error) {
-	var user *models.User
+	user := new(models.User)
+
 	query := make(bson.M)
-	query["facebook"] = bson.M{"id": fbID}
+	query["facebook.id"] = fbID
 
 	err := db.Conn.GetOne(query, config.UserColl, &user)
 	fmt.Println("fetching by ", query, user, err, fbID)

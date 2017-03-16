@@ -8,7 +8,7 @@ import (
 
 // BaseModel - Base model
 type BaseModel struct {
-	ID        bson.ObjectId `json:"_id,omitempty" bson:"_id" required:"true"`
+	ID        bson.ObjectId `json:"_id,omitempty" bson:"_id,omitempty" required:"true"`
 	CreatedOn int64         `json:"created_on" bson:"created_on"`
 	UpdatedOn int64         `json:"updated_on" bson:"updated_on"`
 }
