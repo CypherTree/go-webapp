@@ -26,7 +26,18 @@ func GetByFbID(fbID string) (*models.User, error) {
 	query["facebook.id"] = fbID
 
 	err := db.Conn.GetOne(query, config.UserColl, &user)
-	fmt.Println("fetching by ", query, user, err, fbID)
+
+	return user, err
+}
+
+// GetByIgID - Fetch one user by instagram id
+func GetByIgID(igID string) (*models.User, error) {
+	user := new(models.User)
+
+	query := make(bson.M)
+	query["instagram.id"] = igID
+
+	err := db.Conn.GetOne(query, config.UserColl, &user)
 
 	return user, err
 }
@@ -63,7 +74,7 @@ func ValidateAuthToken(tokenString string, session *models.Session) {
 
 	if claims, ok := token.Claims.(CustomClaims); ok && token.Valid {
 		session = &models.Session{
-			UserID:      claims.Id,
+			UserID:      bson.ObjectId(claims.Id),
 			UserRole:    claims.UserRole,
 			TokenString: tokenString,
 			IssuedAt:    claims.IssuedAt,

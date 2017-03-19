@@ -10,6 +10,9 @@ const FbAccessTokenURL = "https://graph.facebook.com/v2.7/oauth/access_token"
 // FbGraphAPIURL - Facebook graph api url
 const FbGraphAPIURL = "https://graph.facebook.com/v2.7/me"
 
+// IgAccessTokenURL - Instagram access token url
+const IgAccessTokenURL = "https://api.instagram.com/oauth/access_token"
+
 // AuthHeaderName - Authentication Header Name
 const AuthHeaderName = "X-Auth-Name"
 

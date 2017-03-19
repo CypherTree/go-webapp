@@ -8,6 +8,7 @@ type config struct {
 	DbName          string
 	Port            string
 	FbSecret        string
+	IgSecret        string
 	AuthTokenSecret string
 	RedisURL        string
 	RedisPwd        string
@@ -33,6 +34,10 @@ func (c *config) MakeConfig() {
 
 	if FbSecret := os.Getenv("FB_SECRET"); FbSecret != "" {
 		c.FbSecret = FbSecret
+	}
+
+	if IgSecret := os.Getenv("IG_SECRET"); IgSecret != "" {
+		c.IgSecret = IgSecret
 	}
 
 	if AuthTokenSecret := os.Getenv("AUTH_TOKEN_SECRET"); AuthTokenSecret != "" {

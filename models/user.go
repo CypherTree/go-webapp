@@ -1,5 +1,7 @@
 package models
 
+import "gopkg.in/mgo.v2/bson"
+
 const (
 	UserRoleUnknown  = 0
 	UserRoleExpert   = 1
@@ -26,6 +28,7 @@ type Facebook struct {
 // Instagram - Instagram login model
 type Instagram struct {
 	BaseThirdParty `bson:",inline"`
+	Username       string `json:"username" bson:"username"`
 }
 
 // Twitter - Twitter login model
@@ -48,7 +51,7 @@ type User struct {
 
 // Session - User session model
 type Session struct {
-	UserID      string
+	UserID      bson.ObjectId
 	UserRole    int
 	TokenString string
 	IssuedAt    int64

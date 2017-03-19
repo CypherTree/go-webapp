@@ -18,6 +18,7 @@ func registerHandlers() *gin.Engine {
 
 	// auth routes
 	r.POST("/auth/facebook", handlers.Facebook)
+	r.POST("/auth/instagram", handlers.Instagram)
 
 	return r
 }
