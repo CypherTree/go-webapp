@@ -24,7 +24,7 @@ func (c *config) MakeConfig() {
 	c.RedisURL = "localhost:6379"
 
 	// get enviroment vars and override default values
-	if DbURL := os.Getenv("MONGODB_URL"); DbURL != "" {
+	if DbURL := os.Getenv("MONGODB_URI"); DbURL != "" {
 		c.DbURL = DbURL
 	}
 
