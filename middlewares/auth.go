@@ -16,6 +16,7 @@ func AuthSetUser() gin.HandlerFunc {
 		tokenString := c.Request.Header.Get(config.AuthHeaderName)
 		session := &models.Session{}
 		userapi.ValidateAuthToken(tokenString, session)
+
 		c.Set("UserSession", session)
 		c.Next()
 	}

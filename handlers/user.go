@@ -82,6 +82,11 @@ func Facebook(c *gin.Context) {
 			LastName:  fb.LastName,
 			Email:     fb.Email,
 		}
+		// user created, now start scraping data
+		err = facebook.SaveInitFeed(&user.Fb)
+		if err != nil {
+			panic(err)
+		}
 	} else {
 		user.Fb = fb
 	}
@@ -96,6 +101,7 @@ func Instagram(c *gin.Context) {
 	// get access token
 	q, _, err := utils.MakeOauthQparams(c.Request.Body)
 	q.Add("client_secret", config.Settings.IgSecret)
+	q.Add("scope", "basic+public_content+follower_list")
 	err = instagram.GetAccessToken(&ig, q)
 	fmt.Println("Trying to get access token using", q)
 	if err != nil {
@@ -112,6 +118,12 @@ func Instagram(c *gin.Context) {
 		}
 	} else {
 		user.Ig = ig
+	}
+
+	fmt.Println("Now get init data")
+	err = instagram.SaveInitFeed(&user.Ig)
+	if err != nil {
+		panic(err)
 	}
 
 	saveUser(user, c)

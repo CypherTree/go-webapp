@@ -8,6 +8,7 @@ type config struct {
 	DbName          string
 	Port            string
 	FbSecret        string
+	FbWebHookToken  string
 	IgSecret        string
 	AuthTokenSecret string
 	RedisURL        string
@@ -34,6 +35,10 @@ func (c *config) MakeConfig() {
 
 	if FbSecret := os.Getenv("FB_SECRET"); FbSecret != "" {
 		c.FbSecret = FbSecret
+	}
+
+	if FbWebHookToken := os.Getenv("FB_WEBHOOK_TOKEN"); FbWebHookToken != "" {
+		c.FbWebHookToken = FbWebHookToken
 	}
 
 	if IgSecret := os.Getenv("IG_SECRET"); IgSecret != "" {

@@ -3,11 +3,15 @@ package instagram
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"go-webapp/config"
 	"go-webapp/models"
+	"io/ioutil"
 	"net/http"
 	"net/url"
 	"strings"
+
+	"github.com/tidwall/gjson"
 )
 
 type InstagramUser struct {
@@ -44,6 +48,34 @@ func GetAccessToken(ig *models.Instagram, q url.Values) error {
 	ig.LastName = names[1]
 	ig.Username = igResp.User.Username
 	ig.AccessToken = igResp.AccessToken
+
+	return nil
+}
+
+// SaveInitFeed - Fetch followers and initial posts of user from instagram
+func SaveInitFeed(ig *models.Instagram) error {
+	q := url.Values{}
+	q.Set("access_token", ig.AccessToken)
+	userResp, _ := http.Get(config.IgAPIURL + "/users/self/followed-by?" + q.Encode())
+	fmt.Println("status from ig is ", userResp.StatusCode)
+	if userResp.StatusCode != http.StatusOK {
+		return errors.New("Not able to fetch instagram followers")
+	}
+
+	defer userResp.Body.Close()
+	json, err := ioutil.ReadAll(userResp.Body)
+
+	if err != nil {
+		return errors.New("Unable to parse response from facebook feed: " + err.Error())
+	}
+
+	jsonStr := string(json[:])
+	dataJSON := gjson.Get(jsonStr, "data")
+
+	fmt.Println("Got something", dataJSON)
+	for _, item := range dataJSON.Array() {
+		fmt.Println(item.String())
+	}
 
 	return nil
 }
