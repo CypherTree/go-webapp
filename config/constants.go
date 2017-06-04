@@ -17,7 +17,7 @@ const IgAccessTokenURL = "https://api.instagram.com/oauth/access_token"
 const IgAPIURL = "https://api.instagram.com/v1"
 
 // AuthHeaderName - Authentication Header Name
-const AuthHeaderName = "X-Auth-Name"
+const AuthHeaderName = "X-Auth-Token"
 
 // TokenExpiry - Set token expiration time to 2 days
 const TokenExpiry = time.Hour * 48

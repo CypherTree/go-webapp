@@ -1,60 +1,27 @@
 package config
 
-import "os"
+import "github.com/caarlos0/env"
 
 // Config - configure environment variables, settings
 type config struct {
-	DbURL           string
-	DbName          string
-	Port            string
-	FbSecret        string
-	FbWebHookToken  string
-	IgSecret        string
-	AuthTokenSecret string
-	RedisURL        string
-	RedisPwd        string
+	DbURL           string `env:"MONGODB_URI" envDefault:"mongodb://localhost/go-webapp"`
+	DbName          string `env:"MONGDB_NAME" envDefault:"go-webapp"`
+	Port            string `env:"PORT" envDefault:"3000"`
+	FbSecret        string `env:"FB_SECRET,required"`
+	FbWebHookToken  string `env:"FB_WEBHOOK_TOKEN,required"`
+	IgSecret        string `env:"IG_SECRET,required"`
+	AuthTokenSecret string `env:"AUTH_TOKEN_SECRET,required"`
+	RedisURL        string `env:"REDIS_URL" envDefault:"localhost:6379"`
+	RedisPwd        string `env:"REDIS_PWD"`
 }
 
 // MakeConfig - add values to config from environment variables
 func (c *config) MakeConfig() {
 
-	// default values
-	c.DbURL = "mongodb://localhost/gowebapp-try"
-	c.DbName = "gowebapp-try"
-	c.Port = "3000"
-	c.RedisURL = "localhost:6379"
+	err := env.Parse(c)
 
-	// get enviroment vars and override default values
-	if DbURL := os.Getenv("MONGODB_URI"); DbURL != "" {
-		c.DbURL = DbURL
-	}
-
-	if Port := os.Getenv("PORT"); Port != "" {
-		c.Port = Port
-	}
-
-	if FbSecret := os.Getenv("FB_SECRET"); FbSecret != "" {
-		c.FbSecret = FbSecret
-	}
-
-	if FbWebHookToken := os.Getenv("FB_WEBHOOK_TOKEN"); FbWebHookToken != "" {
-		c.FbWebHookToken = FbWebHookToken
-	}
-
-	if IgSecret := os.Getenv("IG_SECRET"); IgSecret != "" {
-		c.IgSecret = IgSecret
-	}
-
-	if AuthTokenSecret := os.Getenv("AUTH_TOKEN_SECRET"); AuthTokenSecret != "" {
-		c.AuthTokenSecret = AuthTokenSecret
-	}
-
-	if RedisURL := os.Getenv("REDIS_URL"); RedisURL != "" {
-		c.RedisURL = RedisURL
-	}
-
-	if RedisPwd := os.Getenv("REDIS_PWD"); RedisPwd != "" {
-		c.RedisPwd = RedisPwd
+	if err != nil {
+		panic("Error while parsing config. Please check all env. variables")
 	}
 }
 
