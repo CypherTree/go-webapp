@@ -4,8 +4,8 @@ import "github.com/caarlos0/env"
 
 // Config - configure environment variables, settings
 type config struct {
-	DbURL           string `env:"MONGODB_URI" envDefault:"mongodb://localhost/go-webapp"`
-	DbName          string `env:"MONGDB_NAME" envDefault:"go-webapp"`
+	DbURL           string `env:"MONGODB_URI" envDefault:"mongodb://localhost/"`
+	DbName          string `env:"MONGODB_NAME" envDefault:"go-webapp"`
 	Port            string `env:"PORT" envDefault:"3000"`
 	FbSecret        string `env:"FB_SECRET,required"`
 	FbWebHookToken  string `env:"FB_WEBHOOK_TOKEN,required"`
