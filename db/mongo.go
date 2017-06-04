@@ -47,6 +47,7 @@ func MakeConn(connString string, dbname string) *MConn {
 	}
 
 	dialInfo.Timeout = 30 * time.Second
+	dialInfo.Database = dbname
 	session, err := mgo.DialWithInfo(dialInfo)
 
 	if err != nil {
