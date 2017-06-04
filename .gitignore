@@ -13,5 +13,8 @@
 # Project-local glide cache, RE: https://github.com/Masterminds/glide/issues/736
 .glide/
 
-# Vendor directory
+# Other directories and binaries
 vendor/
+gin-bin
+main
+go-webapp
