@@ -82,7 +82,7 @@ func Facebook(c *gin.Context) {
 			Email:     fb.Email,
 		}
 		// user created, now start scraping data
-		err = facebook.FetchFeed(user, 0)
+		err = facebook.FetchFeed(user, "")
 		if err != nil {
 			panic(err)
 		}

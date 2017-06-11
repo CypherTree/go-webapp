@@ -73,13 +73,13 @@ func GetProfile(fb *models.Facebook) error {
 }
 
 // FetchFeed - Fetch first n records from /feed of facebook api
-func FetchFeed(user *models.User, since uint32) error {
+func FetchFeed(user *models.User, since string) error {
 
 	q := url.Values{}
 	q.Set("access_token", user.Fb.AccessToken)
 	q.Add("fields", strings.Join(FbAPIFields, ","))
 
-	if since != 0 {
+	if since != "" {
 		q.Add("since", string(since))
 	}
 

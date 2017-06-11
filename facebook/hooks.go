@@ -59,14 +59,14 @@ func ListenUpdates() {
 			continue
 		}
 
-		fbID, _ := db.Redis.Get(redisPrefix + update.Entry[0].ID).Result()
-		user, err := userapi.GetByFbID(fbID)
+		since, _ := db.Redis.Get(redisPrefix + update.Entry[0].ID).Result()
+		user, err := userapi.GetByFbID(update.Entry[0].ID)
 
 		if err != nil || user == nil {
 			continue
 		}
 
-		FetchFeed(user, update.Entry[0].Time)
+		FetchFeed(user, since)
 
 		db.Redis.Set(redisPrefix+update.Entry[0].ID, update.Entry[0].Time, time.Duration(time.Hour*24*10))
 	}
