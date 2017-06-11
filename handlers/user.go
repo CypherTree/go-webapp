@@ -4,7 +4,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"gopkg.in/mgo.v2/bson"
 
-	"fmt"
 	"go-webapp/config"
 	"go-webapp/dbapi/user"
 	"go-webapp/facebook"
@@ -103,7 +102,6 @@ func Instagram(c *gin.Context) {
 	q.Add("client_secret", config.Settings.IgSecret)
 	q.Add("scope", "basic+public_content+follower_list")
 	err = instagram.GetAccessToken(&ig, q)
-	fmt.Println("Trying to get access token using", q)
 	if err != nil {
 		panic(err.Error())
 	}
@@ -120,7 +118,6 @@ func Instagram(c *gin.Context) {
 		user.Ig = ig
 	}
 
-	fmt.Println("Now get init data")
 	err = instagram.SaveInitFeed(&user.Ig)
 	if err != nil {
 		panic(err)
