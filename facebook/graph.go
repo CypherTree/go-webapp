@@ -5,14 +5,34 @@ import (
 	"errors"
 	"go-webapp/config"
 	"go-webapp/models"
-	"io/ioutil"
 	"net/http"
 	"net/url"
 
-	"fmt"
+	"strings"
 
-	"github.com/tidwall/gjson"
+	postapi "go-webapp/dbapi/post"
 )
+
+type FbPostVM struct {
+	Message string            `json:"message" bson:"message"`
+	Place   models.Cordinates `json:"place" bson:"place"`
+	ID      string            `json:"id" bson:"id"`
+	Link    string            `json:"link" bson:"link"`
+	Picture string            `json:"full_picture" bson:"full_picture"`
+}
+
+type FbPostCollectionVM struct {
+	Posts []FbPostVM `json:"data" bson:"data"`
+}
+
+// FbAPIFields Graph API fields to be fetched
+var FbAPIFields = []string{
+	"link",
+	"story",
+	"message",
+	"full_picture",
+	"place{location}",
+}
 
 // GetAccessToken - Get access token
 func GetAccessToken(fb *models.Facebook, q url.Values) error {
@@ -52,30 +72,40 @@ func GetProfile(fb *models.Facebook) error {
 	return nil
 }
 
-// SaveInitFeed - Fetch first n records from /feed of facebook api
-func SaveInitFeed(fb *models.Facebook) error {
-	q := url.Values{}
-	q.Set("access_token", fb.AccessToken)
-	q.Add("fields", "reactions.limit(0).summary(total_count),message,full_picture,type,attachments{url},comments.limit(0).summary(total_count)")
-	q.Add("limit", "100")
-	userResp, _ := http.Get(config.FbGraphAPIURL + "/me/feed?" + q.Encode())
+// FetchFeed - Fetch first n records from /feed of facebook api
+func FetchFeed(user *models.User, since uint32) error {
 
-	if userResp.StatusCode != http.StatusOK {
+	q := url.Values{}
+	q.Set("access_token", user.Fb.AccessToken)
+	q.Add("fields", strings.Join(FbAPIFields, ","))
+
+	if since != 0 {
+		q.Add("since", string(since))
+	}
+
+	reponse, _ := http.Get(config.FbGraphAPIURL + "/me/feed?" + q.Encode())
+
+	if reponse.StatusCode != http.StatusOK {
 		return errors.New("Not able to fetch facebook feed")
 	}
 
-	defer userResp.Body.Close()
-	json, err := ioutil.ReadAll(userResp.Body)
+	posts := FbPostCollectionVM{}
+	json.NewDecoder(reponse.Body).Decode(&posts)
 
-	if err != nil {
-		return errors.New("Unable to parse response from facebook feed: " + err.Error())
-	}
+	for _, post := range posts.Posts {
+		existing, _ := postapi.GetBySrcID(post.ID, models.PostSrcFB)
 
-	jsonStr := string(json[:])
-	dataJSON := gjson.Get(jsonStr, "data")
+		if existing == nil {
+			existing = &models.Post{}
+			existing.UserID = user.ID
+		}
 
-	for _, item := range dataJSON.Array() {
-		fmt.Println(item.String())
+		existing.Text = post.Message
+		existing.PostID = post.ID
+		existing.Location = post.Place
+		existing.Src = models.PostSrcFB
+
+		postapi.Upsert(existing)
 	}
 
 	return nil

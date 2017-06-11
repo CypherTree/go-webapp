@@ -27,3 +27,4 @@ const RefreshTokenExpiry = time.Hour * 24 * 15
 
 // Collection names
 const UserColl = "users"
+const PostColl = "posts"

@@ -2,11 +2,16 @@ package facebook
 
 import (
 	"encoding/json"
-	"fmt"
 	"go-webapp/config"
+	"time"
+
+	"go-webapp/db"
+	"go-webapp/dbapi/user"
 
 	"github.com/gin-gonic/gin"
 )
+
+var UpdateChannel chan fbUpdate
 
 type fbUpdateEntry struct {
 	Time          uint32   `json:"time" bson:"time"`
@@ -21,7 +26,6 @@ type fbUpdate struct {
 
 // Subscribe - get endpoint for facebook subscribe
 func Subscribe(c *gin.Context) {
-
 	if hookToken, _ := c.GetQuery("hub.verify_token"); hookToken != config.Settings.FbWebHookToken {
 		c.JSON(400, "Wrong token")
 		return
@@ -29,6 +33,15 @@ func Subscribe(c *gin.Context) {
 
 	hubChallenge, _ := c.GetQuery("hub.challenge")
 	c.String(200, hubChallenge)
+
+	// if previously subscribed and channel is running then close it.
+	if UpdateChannel != nil {
+		close(UpdateChannel)
+	}
+
+	// (re)create channel for handling updates from fb
+	UpdateChannel = make(chan fbUpdate, 100)
+	go ListenUpdates()
 }
 
 // Listen - Facebook changes listener
@@ -36,5 +49,25 @@ func Listen(c *gin.Context) {
 	c.String(200, "")
 	update := fbUpdate{}
 	json.NewDecoder(c.Request.Body).Decode(&update)
-	fmt.Printf("New update: ", update)
+	UpdateChannel <- update
+}
+
+func ListenUpdates() {
+	redisPrefix := "LastFbUpdate_"
+	for update := range UpdateChannel {
+		if update.Entry == nil || len(update.Entry) == 0 {
+			continue
+		}
+
+		fbID, _ := db.Redis.Get(redisPrefix + update.Entry[0].ID).Result()
+		user, err := userapi.GetByFbID(fbID)
+
+		if err != nil || user == nil {
+			continue
+		}
+
+		FetchFeed(user, update.Entry[0].Time)
+
+		db.Redis.Set(redisPrefix+update.Entry[0].ID, update.Entry[0].Time, time.Duration(time.Hour*24*10))
+	}
 }
